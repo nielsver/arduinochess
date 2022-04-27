@@ -32,6 +32,10 @@ void setup() {
   pinMode(button1, INPUT);
   pinMode(button2, INPUT);
   pinMode(resetbutton, INPUT);
+  int botton = 0;
+  int game = 0;
+  int statu = 0;
+  int stat = 0;
 }
 void Display(unsigned char num)
 {
@@ -49,18 +53,60 @@ void testbutton() {
   noTone(buzzer);
   }
 }
-void toonstatistieken() {
-  
-}
+
 
 void loop() { 
-  // begin met toonstatistieken tot je de resetknop(startknop) indrukt 
-  //int spelgedaan = 0, als het spel echt gedaan is wordt die 1 en gaat de functie eindevanspel() in 
-  //als je op de resetknop druk dan kom je terug bij toonstatistieken terecht en dan moet je nog eens op de resetknop drukken omo het spel opnieuw te starten
-  //je hebt 2 funties witaanzet en zwartaanzet
-  //while(timer > 0 && drukknop == LOW)
+
+    while(botton == 0)
+  {
+    botton = statistieken();
+  }
+  while(game == 0){
+    game = spelen()
+  }
+  finish();
+}
+int statistieken() {
+  /* display statistieken + press reset(startbotton) to play if start botton is pressed return 1 else 0 */
+}
+int spelen() {
+  /* als een timer op nul staat of als een speler een knop meer dan 5 seconden duwt return 1 + extra informatie. anders return 0 met daarvoor de code om de timer een seconde te laten zakken of als de knop is ingedrukt van speler wisselen
+  hierin kan nog een extra functie worden gemaakt van timer wit en timer zwart ook enzo hangt af wat het makkelijst is*/ 
+
+  while (statu != 1 || stat != 1){
+    statu = ctrwhite();
+    stat = ctrblack();
+  }
   
   
+}
+void finish() {
+  /* 5 seconde durende animatie ofzo te tonen wie gewonnen is + aan te tonen dat het spel gedaan is */
+}
+int ctrwhite(){
+  while (btnstate != HIGH || ctr1 = 0){
+    ctr1--;
+  }
+  if( ctr1 > 0){
+    return 0;
+  }
+  else {
+    return 1;
+  }
+  
+}
+int ctrblack(){
+  while (btnstate != HIGH || ctr1 = 0){
+    ctr2--;
+  }
+  if(ctr2 > 0) {
+    return 0;
+  }
+  else {
+    return 1;
+  }
+
+} 
   
   /*Display(1);
   delay(500);
@@ -89,4 +135,3 @@ void loop() {
   digitalWrite(led2, HIGH);
   delay(1000);*/
   
-}
