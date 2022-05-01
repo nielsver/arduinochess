@@ -11,8 +11,14 @@ int button2 = 3;
 int resetbutton = 13;
 int aantalspellen = 0;
 int gemiddeldespeelduur = 0;
-int meestgewonnen;
-int langstespel;
+int gewonnenwit= 0;
+int gewonnenzwart = 0;
+int langstespel = 0;
+int botton = 0;
+int game = 0;
+int i = 0;
+int statu = 0;
+  int stat = 0;
 
 
 unsigned char table[]=
@@ -32,10 +38,8 @@ void setup() {
   pinMode(button1, INPUT);
   pinMode(button2, INPUT);
   pinMode(resetbutton, INPUT);
-  int botton = 0;
-  int game = 0;
-  int statu = 0;
-  int stat = 0;
+
+  
 }
 void Display(unsigned char num)
 {
@@ -62,12 +66,68 @@ void loop() {
     botton = statistieken();
   }
   while(game == 0){
-    game = spelen()
+    game = spelen();
   }
   finish();
 }
 int statistieken() {
   /* display statistieken + press reset(startbotton) to play if start botton is pressed return 1 else 0 */
+  if(resetbutton == HIGH)
+  {
+    return 1;
+  }
+  switch(i){
+    case 0:
+    lcd.clear();
+    lcd.print(String("there are: ") + String(aantalspellen) + String("games played"));
+    lcd.setCursor(0,1);
+    lcd.write("press the start button to play");
+    if(resetbutton == HIGH)
+    {
+    return 1;
+    }
+    i = i+ 1;
+    break;
+    case 1:
+    lcd.clear();
+    lcd.print(String("longest game: ") + String(langstespel) + String("minutes"));
+    lcd.setCursor(0,1);
+    lcd.write("press the start button to play");
+    if(resetbutton == HIGH)
+    {
+    return 1;
+    }
+    i = i+ 1;
+    break;
+    case 2:
+    lcd.clear();
+    lcd.print(String("average playing time: ") + String(gemiddeldespeelduur) + String("minutes"));
+    lcd.setCursor(0,1);
+    lcd.write("press the start button to play");
+    if(resetbutton == HIGH)
+    {
+    return 1;
+    }
+    i = i+ 1;
+    break;
+    case 3:
+    lcd.clear();
+    if( gewonnenwit > gewonnenzwart) {
+      lcd.print(String("white has won the most games: ") + String(gewonnenwit));
+    }
+    else {
+      lcd.print(String("black has won the most games: ") + String(gewonnenzwart));
+    }
+    lcd.setCursor(0,1);
+    lcd.write("press the start button to play");
+    if(resetbutton == HIGH)
+    {
+    return 1;
+    }
+    i = 0;
+    break;
+  }
+  return 0;
 }
 int spelen() {
   /* als een timer op nul staat of als een speler een knop meer dan 5 seconden duwt return 1 + extra informatie. anders return 0 met daarvoor de code om de timer een seconde te laten zakken of als de knop is ingedrukt van speler wisselen
