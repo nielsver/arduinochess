@@ -18,7 +18,11 @@ int botton = 0;
 int game = 0;
 int i = 0;
 int statu = 0;
-  int stat = 0;
+int stat = 0;
+int ctr1 = 3600;
+int ctr2 = 3600;
+int huidigspel = 0;
+int speeltijd = 0;
 
 
 unsigned char table[]=
@@ -49,14 +53,14 @@ void Display(unsigned char num)
   digitalWrite(latch,HIGH);
   
 }
-void testbutton() {
+/*void testbutton() {
   int buttonstate = digitalRead(button1);
   if(buttonstate == HIGH) {
   tone(buzzer, 1000);
   delay(1000);
   noTone(buzzer);
   }
-}
+}*/
 
 
 void loop() { 
@@ -65,9 +69,23 @@ void loop() {
   {
     botton = statistieken();
   }
+  aantalspellen = aantalspellen + 1;
   while(game == 0){
     game = spelen();
   }
+  speeltijd = speeltijd + huidigspel;
+  if (langstespel < huidigspel){
+    langstespel = huidigspel;
+  }
+  gemiddeldespeelduur = speeltijd / aantalspellen;
+  if(game == 2){
+    gewonnenwit++;
+  }
+  else{
+    gewonnenzwart++;
+  }
+  
+  
   finish();
 }
 int statistieken() {
@@ -115,6 +133,9 @@ int statistieken() {
     if( gewonnenwit > gewonnenzwart) {
       lcd.print(String("white has won the most games: ") + String(gewonnenwit));
     }
+    else if(gewonnenwit == gewonnenzwart) {
+      lcd.print(String("the games are tied: ") + String(gewonnenzwart));
+    }
     else {
       lcd.print(String("black has won the most games: ") + String(gewonnenzwart));
     }
@@ -137,15 +158,22 @@ int spelen() {
     statu = ctrwhite();
     stat = ctrblack();
   }
+  if(statu == 1){
+    return 2;
+  }
+  else {
+    return 1;
+  }
   
   
-}
-void finish() {
-  /* 5 seconde durende animatie ofzo te tonen wie gewonnen is + aan te tonen dat het spel gedaan is */
 }
 int ctrwhite(){
-  while (btnstate != HIGH || ctr1 = 0){
+  while (button1 != HIGH || ctr1 == 0){
+    digitalWrite(ctr1);
+    delay(1000);
+    huidigspel++;
     ctr1--;
+    
   }
   if( ctr1 > 0){
     return 0;
@@ -156,7 +184,10 @@ int ctrwhite(){
   
 }
 int ctrblack(){
-  while (btnstate != HIGH || ctr1 = 0){
+  while (button2 != HIGH || ctr1 == 0){
+    digitalWrite(ctr2);
+    delay(1000);
+    huidigspel++;
     ctr2--;
   }
   if(ctr2 > 0) {
@@ -168,6 +199,11 @@ int ctrblack(){
 
 } 
   
+void finish() {
+  /* 5 seconde durende animatie ofzo te tonen wie gewonnen is + aan te tonen dat het spel gedaan is */
+}
+
+
   /*Display(1);
   delay(500);
   Display(2);
