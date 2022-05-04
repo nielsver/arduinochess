@@ -8,13 +8,12 @@ int led1 = 7;
 int led2 = 6;
 int button1 = 2;
 int button2 = 3;
-int resetbutton = 13;
+int resetbutton = 11;
 int aantalspellen = 0;
 int gemiddeldespeelduur = 0;
 int gewonnenwit= 0;
 int gewonnenzwart = 0;
 int langstespel = 0;
-int button = 0;
 int game = 0;
 int i = 0;
 int statu = 0;
@@ -42,9 +41,8 @@ void setup() {
   pinMode(button1, INPUT);
   pinMode(button2, INPUT);
   pinMode(resetbutton, INPUT);
-
-  
 }
+
 void Display(unsigned char num)
 {
 
@@ -53,23 +51,11 @@ void Display(unsigned char num)
   digitalWrite(latch,HIGH);
   
 }
-/*void testbutton() {
-  int buttonstate = digitalRead(button1);
-  if(buttonstate == HIGH) {
-  tone(buzzer, 1000);
-  delay(1000);
-  noTone(buzzer);
-  }
-}*/
-
 
 void loop() { 
-
-    while(button == 0)
-  {
-    button = statistieken();
-  }
-  aantalspellen = aantalspellen + 1;
+  reset();
+  statistieken();
+  aantalspellen++;
   while(game == 0){
     game = spelen();
   }
@@ -84,72 +70,58 @@ void loop() {
   else{
     gewonnenzwart++;
   }
-  
-  
-  finish();
+  finish(game, huidigspel);
 }
-int statistieken() {
+
+void statistieken() {
   /* display statistieken + press reset(startbotton) to play if start botton is pressed return 1 else 0 */
-  if(resetbutton == HIGH)
-  {
-    return 1;
-  }
-  switch(i){
-    case 0:
+    
     lcd.clear();
-    lcd.print(String("there are: ") + String(aantalspellen) + String("games played"));
-    lcd.setCursor(0,1);
-    lcd.write("press the start button to play");
-    if(resetbutton == HIGH)
-    {
-    return 1;
-    }
-    i = i+ 1;
-    break;
-    case 1:
+    lcd.print(String("games played: ") + String(aantalspellen));
+    delay(5000);
     lcd.clear();
-    lcd.print(String("longest game: ") + String(langstespel) + String("minutes"));
+    lcd.print(String("longest game: "));
     lcd.setCursor(0,1);
-    lcd.write("press the start button to play");
-    if(resetbutton == HIGH)
-    {
-    return 1;
-    }
-    i = i+ 1;
-    break;
-    case 2:
+    lcd.print(String(langstespel) + String(" seconds")); // als we de timer met minuten gaan doen moet dit veranderd worden
+    delay(5000);
     lcd.clear();
-    lcd.print(String("average playing time: ") + String(gemiddeldespeelduur) + String("minutes"));
+    lcd.print(String("avg game time:"));
     lcd.setCursor(0,1);
-    lcd.write("press the start button to play");
-    if(resetbutton == HIGH)
-    {
-    return 1;
-    }
-    i = i+ 1;
-    break;
-    case 3:
+    lcd.print(String(gemiddeldespeelduur) + String(" seconds"));
+    delay(5000);
     lcd.clear();
     if( gewonnenwit > gewonnenzwart) {
-      lcd.print(String("white has won the most games: ") + String(gewonnenwit));
+      lcd.print(String("white has won: "));
+      lcd.setCursor(0,1);
+      lcd.print(String(gewonnenwit)+String("-")+String(gewonnenzwart)); //eventueel 63%w/r
+      delay(5000);
     }
     else if(gewonnenwit == gewonnenzwart) {
-      lcd.print(String("the games are tied: ") + String(gewonnenzwart));
+      lcd.print(String("games are tied:"));
+      lcd.setCursor(0,1);
+      lcd.print(String(gewonnenwit)+String("-")+String(gewonnenzwart));
+      delay(5000);
     }
     else {
-      lcd.print(String("black has won the most games: ") + String(gewonnenzwart));
+      lcd.print(String("black has won:"));
+      lcd.setCursor(0,1);
+      lcd.print(String(gewonnenzwart)+String("-")+String(gewonnenwit));
+      delay(5000);
     }
-    lcd.setCursor(0,1);
-    lcd.write("press the start button to play");
-    if(resetbutton == HIGH)
-    {
-    return 1;
-    }
-    i = 0;
-    break;
-  }
-  return 0;
+    int y = 0;
+    while (y == 0){
+      int resetbuttonstate = digitalRead(resetbutton);
+      lcd.clear();
+      lcd.print(String("press start"));
+      delay(100);
+      if(resetbuttonstate == HIGH)
+      {
+        y = 1;
+        lcd.clear();
+      }
+    } 
 }
+
 int spelen() {
   /* als een timer op nul staat of als een speler een knop meer dan 5 seconden duwt return 1 + extra informatie. anders return 0 met daarvoor de code om de timer een seconde te laten zakken of als de knop is ingedrukt van speler wisselen
   hierin kan nog een extra functie worden gemaakt van timer wit en timer zwart ook enzo hangt af wat het makkelijst is*/ 
@@ -164,19 +136,24 @@ int spelen() {
   else {
     return 1;
   }
-  
-  
 }
+
 int ctrwhite(){
-  while (button1 != HIGH || ctr1 == 0){
+  int buttonstate1 = digitalRead(button1);
+  lcd.print(String("wit aan zet"));
+  while (buttonstate1 != HIGH || ctr1 != 0){
+    int buttonstate1 = digitalRead(button1);
+    
     digitalWrite(led1,HIGH);
-    Display(ctr1);
+    //Display(ctr1);
     delay(1000);
     huidigspel++;
     ctr1--;
     
   }
   if( ctr1 > 0){
+    digitalWrite(led1, LOW);
+    lcd.clear();
     return 0;
   }
   else {
@@ -185,14 +162,20 @@ int ctrwhite(){
   
 }
 int ctrblack(){
+  int buttonstate2 = digitalRead(button2);
+  lcd.print(String("zwart aan zet"));
   while (button2 != HIGH || ctr1 == 0){
+    int buttonstate2 = digitalRead(button2);
+    
     digitalWrite(led2,HIGH);
-    Display(ctr2);
+    //Display(ctr2);
     delay(1000);
     huidigspel++;
     ctr2--;
   }
   if(ctr2 > 0) {
+    digitalWrite(led2, LOW);
+    lcd.clear();
     return 0;
   }
   else {
@@ -201,8 +184,48 @@ int ctrblack(){
 
 } 
   
-void finish() {
+void finish(int game, int huidigspel) {
+  lcd.print(String("het spel is gedaan"));
+  delay(2000);
+  lcd.print(String("speeltijd: ") + String(huidigspel) + String("seconden"));
+  lcd.clear();
+  if(game == 2){
+    lcd.print(String("white has won!!!"));
+    tone(buzzer, 1000);
+    for(int i = 0; i<5;i++){
+    digitalWrite(led1, HIGH);
+    delay(500);
+    digitalWrite(led1, LOW);
+    digitalWrite(led2, HIGH);
+    delay(500);
+    digitalWrite(led2, LOW);
+    }
+  }
+  else{
+    lcd.print(String("black has won!!!"));
+    tone(buzzer, 1000);
+    for(int i = 0; i<5;i++){
+    digitalWrite(led1, HIGH);
+    delay(500);
+    digitalWrite(led1, LOW);
+    digitalWrite(led2, HIGH);
+    delay(500);
+    digitalWrite(led2, LOW);
+  }
+  }
+ 
+
+  
   /* 5 seconde durende animatie ofzo te tonen wie gewonnen is + aan te tonen dat het spel gedaan is */
+}
+
+void reset(){
+  game = 0;
+  statu = 0;
+  stat = 0;
+  lcd.clear();
+  noTone(buzzer);
+  huidigspel = 0;
 }
 
 
