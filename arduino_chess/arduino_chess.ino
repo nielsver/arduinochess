@@ -14,7 +14,7 @@ int gemiddeldespeelduur = 0;
 int gewonnenwit= 0;
 int gewonnenzwart = 0;
 int langstespel = 0;
-int botton = 0;
+int button = 0;
 int game = 0;
 int i = 0;
 int statu = 0;
@@ -65,9 +65,9 @@ void Display(unsigned char num)
 
 void loop() { 
 
-    while(botton == 0)
+    while(button == 0)
   {
-    botton = statistieken();
+    button = statistieken();
   }
   aantalspellen = aantalspellen + 1;
   while(game == 0){
@@ -169,7 +169,8 @@ int spelen() {
 }
 int ctrwhite(){
   while (button1 != HIGH || ctr1 == 0){
-    digitalWrite(ctr1);
+    digitalWrite(led1,HIGH);
+    Display(ctr1);
     delay(1000);
     huidigspel++;
     ctr1--;
@@ -185,7 +186,8 @@ int ctrwhite(){
 }
 int ctrblack(){
   while (button2 != HIGH || ctr1 == 0){
-    digitalWrite(ctr2);
+    digitalWrite(led2,HIGH);
+    Display(ctr2);
     delay(1000);
     huidigspel++;
     ctr2--;
