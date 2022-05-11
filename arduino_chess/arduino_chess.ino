@@ -1,9 +1,11 @@
 #include <LiquidCrystal_I2C.h>
+#include <ShiftDisplay.h>
+#include <Wire.h>
 LiquidCrystal_I2C lcd(0x27,16,2);
 int latch=9;  //74HC595  pin 9 STCP
 int clock=10; //74HC595  pin 10 SHCP
 int data=8;   //74HC595  pin 8 DS
-int buzzer = 5;
+int buzzer = 4;
 int led1 = 7;
 int led2 = 6;
 int button1 = 2;
@@ -18,8 +20,8 @@ int game = 0;
 int i = 0;
 int statu = 0;
 int stat = 0;
-int ctr1 = 3600;
-int ctr2 = 3600;
+int ctr1 = 10;
+int ctr2 = 10;
 int huidigspel = 0;
 int speeltijd = 0;
 
@@ -41,6 +43,7 @@ void setup() {
   pinMode(button1, INPUT);
   pinMode(button2, INPUT);
   pinMode(resetbutton, INPUT);
+  Serial.begin(9600);
 }
 
 void Display(unsigned char num)
@@ -48,12 +51,14 @@ void Display(unsigned char num)
 
   digitalWrite(latch,LOW);
   shiftOut(data,clock,MSBFIRST,table[num]);
+  
   digitalWrite(latch,HIGH);
   
 }
 
 void loop() { 
   reset();
+  testdisplay();
   statistieken();
   aantalspellen++;
   while(game == 0){
@@ -126,30 +131,33 @@ int spelen() {
   /* als een timer op nul staat of als een speler een knop meer dan 5 seconden duwt return 1 + extra informatie. anders return 0 met daarvoor de code om de timer een seconde te laten zakken of als de knop is ingedrukt van speler wisselen
   hierin kan nog een extra functie worden gemaakt van timer wit en timer zwart ook enzo hangt af wat het makkelijst is*/ 
 
-  while (statu != 1 || stat != 1){
+  while (statu == 0 && stat == 0){
+    lcd.clear();
     statu = ctrwhite();
-    stat = ctrblack();
+    if(statu == 0){
+      stat = ctrblack();
+    }
   }
   if(statu == 1){
-    return 2;
+    return 1;
   }
   else {
-    return 1;
+    return 2;
   }
 }
 
 int ctrwhite(){
   int buttonstate1 = digitalRead(button1);
+  lcd.clear();
   lcd.print(String("wit aan zet"));
-  while (buttonstate1 != HIGH || ctr1 != 0){
-    int buttonstate1 = digitalRead(button1);
-    
+  int test = 0;
+  while (buttonstate1 == LOW && ctr1 >= 0){
+    buttonstate1 = digitalRead(button1);
     digitalWrite(led1,HIGH);
     //Display(ctr1);
     delay(1000);
     huidigspel++;
-    ctr1--;
-    
+    ctr1--;    
   }
   if( ctr1 > 0){
     digitalWrite(led1, LOW);
@@ -163,10 +171,10 @@ int ctrwhite(){
 }
 int ctrblack(){
   int buttonstate2 = digitalRead(button2);
+  lcd.clear();
   lcd.print(String("zwart aan zet"));
-  while (button2 != HIGH || ctr1 == 0){
-    int buttonstate2 = digitalRead(button2);
-    
+  while (buttonstate2 == LOW && ctr2 >= 0){
+    buttonstate2 = digitalRead(button2);
     digitalWrite(led2,HIGH);
     //Display(ctr2);
     delay(1000);
@@ -181,17 +189,19 @@ int ctrblack(){
   else {
     return 1;
   }
-
 } 
   
 void finish(int game, int huidigspel) {
-  lcd.print(String("het spel is gedaan"));
-  delay(2000);
+  lcd.clear();
+  lcd.print(String("het spel is"));
+  lcd.setCursor(0,1);
+  lcd.print(String("gedaan"));
+  delay(3000);
   lcd.print(String("speeltijd: ") + String(huidigspel) + String("seconden"));
   lcd.clear();
   if(game == 2){
     lcd.print(String("white has won!!!"));
-    tone(buzzer, 1000);
+    tone(buzzer, 1000, 5000);
     for(int i = 0; i<5;i++){
     digitalWrite(led1, HIGH);
     delay(500);
@@ -203,7 +213,7 @@ void finish(int game, int huidigspel) {
   }
   else{
     lcd.print(String("black has won!!!"));
-    tone(buzzer, 1000);
+    tone(buzzer, 1000, 5000);
     for(int i = 0; i<5;i++){
     digitalWrite(led1, HIGH);
     delay(500);
@@ -220,6 +230,8 @@ void finish(int game, int huidigspel) {
 }
 
 void reset(){
+  ctr1 = 10;
+  ctr2 = 10;
   game = 0;
   statu = 0;
   stat = 0;
@@ -228,8 +240,8 @@ void reset(){
   huidigspel = 0;
 }
 
-
-  /*Display(1);
+void testdisplay(){
+  Display(1);
   delay(500);
   Display(2);
   delay(500);
@@ -247,12 +259,6 @@ void reset(){
   delay(500);
   Display(9);
   delay(500);
-  testbutton();
-  tone(buzzer, 1000);
-  delay(1000);
-  noTone(buzzer);
-  digitalWrite(led1, HIGH);
-  delay(1000);
-  digitalWrite(led2, HIGH);
-  delay(1000);*/
+}
+
   
