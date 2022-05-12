@@ -18,8 +18,8 @@ int game = 0;
 int i = 0;
 int statu = 0;
 int stat = 0;
-int ctr1 = 10;
-int ctr2 = 10;
+int ctr1 = 3559;
+int ctr2 = 3559;
 int huidigspel = 0;
 int speeltijd = 0;
 
