@@ -2,9 +2,7 @@
 #include <ShiftDisplay.h>
 #include <Wire.h>
 LiquidCrystal_I2C lcd(0x27,16,2);
-int latch=9;  //74HC595  pin 9 STCP
-int clock=10; //74HC595  pin 10 SHCP
-int data=8;   //74HC595  pin 8 DS
+ShiftDisplay display(COMMON_CATHODE, 3);
 int buzzer = 4;
 int led1 = 7;
 int led2 = 6;
@@ -25,35 +23,16 @@ int ctr2 = 10;
 int huidigspel = 0;
 int speeltijd = 0;
 
-
-unsigned char table[]=
-{0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x77,0x7c
-,0x39,0x5e,0x79,0x71,0x00};
-
 void setup() {
   lcd.init();//initialize LCD
   lcd.clear();
   lcd.backlight(); //schakel backlight in
-  pinMode(latch,OUTPUT);
-  pinMode(clock,OUTPUT);
-  pinMode(data,OUTPUT);
   pinMode(buzzer, OUTPUT);
   pinMode(led1, OUTPUT);
   pinMode(led2, OUTPUT);
   pinMode(button1, INPUT);
   pinMode(button2, INPUT);
   pinMode(resetbutton, INPUT);
-  Serial.begin(9600);
-}
-
-void Display(unsigned char num)
-{
-
-  digitalWrite(latch,LOW);
-  shiftOut(data,clock,MSBFIRST,table[num]);
-  
-  digitalWrite(latch,HIGH);
-  
 }
 
 void loop() { 
@@ -87,12 +66,12 @@ void statistieken() {
     lcd.clear();
     lcd.print(String("longest game: "));
     lcd.setCursor(0,1);
-    lcd.print(String(langstespel) + String(" seconds")); // als we de timer met minuten gaan doen moet dit veranderd worden
+    Displaylcd(langstespel); // als we de timer met minuten gaan doen moet dit veranderd worden
     delay(5000);
     lcd.clear();
     lcd.print(String("avg game time:"));
     lcd.setCursor(0,1);
-    lcd.print(String(gemiddeldespeelduur) + String(" seconds"));
+    Displaylcd(gemiddeldespeelduur);
     delay(5000);
     lcd.clear();
     if( gewonnenwit > gewonnenzwart) {
@@ -154,7 +133,7 @@ int ctrwhite(){
   while (buttonstate1 == LOW && ctr1 >= 0){
     buttonstate1 = digitalRead(button1);
     digitalWrite(led1,HIGH);
-    //Display(ctr1);
+    Display(ctr1);
     delay(1000);
     huidigspel++;
     ctr1--;    
@@ -176,7 +155,7 @@ int ctrblack(){
   while (buttonstate2 == LOW && ctr2 >= 0){
     buttonstate2 = digitalRead(button2);
     digitalWrite(led2,HIGH);
-    //Display(ctr2);
+    Display(ctr2);
     delay(1000);
     huidigspel++;
     ctr2--;
@@ -197,7 +176,7 @@ void finish(int game, int huidigspel) {
   lcd.setCursor(0,1);
   lcd.print(String("gedaan"));
   delay(3000);
-  lcd.print(String("speeltijd: ") + String(huidigspel) + String("seconden"));
+  Displaylcd(huidigspel);
   lcd.clear();
   if(game == 2){
     lcd.print(String("white has won!!!"));
@@ -240,25 +219,36 @@ void reset(){
   huidigspel = 0;
 }
 
-void testdisplay(){
-  Display(1);
-  delay(500);
-  Display(2);
-  delay(500);
-  Display(3);
-  delay(500);
-  Display(4);
-  delay(500);
-  Display(5);
-  delay(500);
-  Display(6);
-  delay(500);
-  Display(7);
-  delay(500);
-  Display(8);
-  delay(500);
-  Display(9);
-  delay(500);
+void Displaylcd(int seconden){
+  int minuten
+  if (seconden < 60)
+  {
+    lcd.print(String("0 : ")+String(seconden) + String(" minuten"));
+  }
+  else
+  { 
+    minuten = seconden / 60;
+    seconden = seconden % 60;
+    lcd.print(String(minuten) + String(" : ") + String(seconden) + String(" minuten));
+  }
 }
-
+void Display(int seconden) {
+    int minuten
+  if (seconden < 60)
+  {
+    display.show(seconden, 1000, ALIGN_RIGHT); // store number and show it for 400ms
+    display.setDot(1, true); // add dot to stored number
+    display.show(1000); // show number with dot for 400ms
+  }
+  else
+  { 
+    minuten = seconden / 60;
+    seconden = seconden % 60;
+    minuten = minuten * 100;
+    minuten = minuten + seconden
+    display.show(minuten, 1000, ALIGN_RIGHT); // store number and show it for 400ms
+    display.setDot(1, true); // add dot to stored number
+    display.show(1000); // show number with dot for 400ms
+  }
+}
   
