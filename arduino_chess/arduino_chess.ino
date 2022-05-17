@@ -1,7 +1,6 @@
 //project arduinochess gemaakt door Johan Hoeben en Niels Vervoort
-#include <LiquidCrystal_I2C.h>
-#include <ShiftDisplay.h>
-#include <Wire.h>
+#include <LiquidCrystal_I2C.h> //https://www.arduino.cc/reference/en/libraries/liquidcrystal/
+#include <ShiftDisplay.h> //https://github.com/MiguelPynto/ShiftDisplay/blob/master/README.md
 LiquidCrystal_I2C lcd(0x27,16,2);
 ShiftDisplay display(COMMON_CATHODE, 3);
 int buzzer = 9;
